@@ -1,6 +1,6 @@
 function pictionary() {
   const socket = io();
-  let canvas, context;
+  let canvas, context, drawing = false;
 
   // draw function takes position and
   function draw(position) {
@@ -16,15 +16,25 @@ function pictionary() {
   canvas[0].width = canvas[0].offsetWidth;
   canvas[0].height = canvas[0].offsetHeight;
   canvas.on('mousemove', event => {
-    let offset = canvas.offset();
-    let position = {x: event.pageX - offset.left,
-                    y: event.pageY - offset.top};
-    draw(position);
-    socket.emit('draw event', position);
+    if (drawing) {
+      let offset = canvas.offset();
+      let position = {x: event.pageX - offset.left,
+                      y: event.pageY - offset.top};
+      draw(position);
+      socket.emit('draw event', position);
+    }
   });
 
   socket.on('draw event', position => {
     draw(position);
+  });
+
+  canvas.on('mousedown', event => {
+    drawing = true;
+  });
+
+  canvas.on('mouseup', event => {
+    drawing = false;
   });
 };
 
