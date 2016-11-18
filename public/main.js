@@ -1,4 +1,5 @@
 function pictionary() {
+  const socket = io();
   let canvas, context;
 
   // draw function takes position and
@@ -19,10 +20,14 @@ function pictionary() {
     let position = {x: event.pageX - offset.left,
                     y: event.pageY - offset.top};
     draw(position);
+    socket.emit('draw event', position);
+  });
+
+  socket.on('draw event', position => {
+    draw(position);
   });
 };
 
 $(document).ready(function() {
-  const socket = io();
   pictionary();
 });

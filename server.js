@@ -19,6 +19,10 @@ io.on('connection', socket => {
   socket.on('disconnect', socket => {
     console.log('User disconnected');
   });
+
+  socket.on('draw event', position => {
+    socket.broadcast.emit('draw event', position);
+  })
 });
 
 server.listen(process.env.PORT || 8080, () => {
