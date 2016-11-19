@@ -1,6 +1,24 @@
 function pictionary() {
   const socket = io();
-  let canvas, context, drawing = false;
+  let canvas, context, guessBox, drawing = false;
+
+  function displayGuess(guess) {
+    let lastGuessBox = $('#last-guess');
+    lastGuessBox.empty().text(guess);
+  }
+
+  function onKeyDown(event) {
+    if (event.keyCode != 13) {
+      return;
+    }
+
+    console.log(guessBox.val());
+    socket.emit('guess', guessBox.val());
+    guessBox.val('');
+  };
+
+  guessBox = $('#guess input');
+  guessBox.on('keydown', onKeyDown);
 
   // draw function takes position and
   function draw(position) {
@@ -35,6 +53,11 @@ function pictionary() {
 
   canvas.on('mouseup', event => {
     drawing = false;
+  });
+
+  socket.on('guess', guess => {
+    console.log(guess);
+    displayGuess(guess);
   });
 };
 

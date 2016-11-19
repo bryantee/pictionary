@@ -9,10 +9,6 @@ app.use(express.static('public'));
 const server = http.Server(app);
 const io = socket_io(server);
 
-// app.get('/', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, 'public/index.html'));
-// });
-
 io.on('connection', socket => {
   console.log('User connected');
 
@@ -22,7 +18,12 @@ io.on('connection', socket => {
 
   socket.on('draw event', position => {
     socket.broadcast.emit('draw event', position);
-  })
+  });
+
+  socket.on('guess', guess => {
+    console.log(`A user guessed: ${guess}`);
+    socket.broadcast.emit('guess', guess);
+  });
 });
 
 server.listen(process.env.PORT || 8080, () => {

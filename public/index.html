@@ -25,6 +25,14 @@ h1 {
 #top-message {
     text-align: center;
     padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+#top-message > div {
+  display: inline-flex;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 canvas {
@@ -43,6 +51,14 @@ canvas {
 <script src="main.js"></script>
 
 <div id="main">
-    <h1>Pictionary</h1>
-    <canvas id="canvas"></canvas>
+  <h1>Pictionary</h1>
+  <div id="top-message">
+    <div id="guess">
+        Make a guess: <input type="text">
+    </div>
+    <div id="last-guess">
+
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
 </div>
