@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node --presets es2015 server.js"
   },
   "keywords": [],
   "author": "",

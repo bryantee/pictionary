@@ -1,7 +1,15 @@
-import http from 'http';
-import express from 'express';
-import socket_io from 'socket.io';
-import path from 'path';
+'use strict'
+
+// import http from 'http';
+// import express from 'express';
+// import socket_io from 'socket.io';
+// import path from 'path';
+
+// Using CommonJS require for Heroku sake...
+const http = require('http');
+const express = require('express');
+const socket_io = require('socket.io');
+const path = require('path');
 
 const app = express();
 app.use(express.static('public'));
