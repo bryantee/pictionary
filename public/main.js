@@ -2,6 +2,10 @@ function pictionary() {
   const socket = io();
   let canvas, context, guessBox, drawing = false;
 
+  const CLIENTSTATE = {
+    drawer: false,
+  };
+
   // handle rendering of guesses
   function displayGuess(guess) {
     let lastGuessBox = $('#last-guess');
@@ -42,9 +46,9 @@ function pictionary() {
   let clickUp = ('ontouchstart' in document.documentElement) ? 'touchend' : 'mouseup';
   let cursorMove = ('ontouchstart' in document.documentElement) ? 'touchmove' : 'mousemove';
 
-  console.log(`clickDown: ${clickDown}`);
-  console.log(`clickUp: ${clickUp}`);
-  console.log(`cursorMove: ${cursorMove}`);
+  // console.log(`clickDown: ${clickDown}`);
+  // console.log(`clickUp: ${clickUp}`);
+  // console.log(`cursorMove: ${cursorMove}`);
 
   canvas.on(cursorMove, event => {
     if (drawing) {
@@ -60,6 +64,15 @@ function pictionary() {
       }
       draw(position);
       socket.emit('draw event', position);
+    }
+  });
+
+  socket.on('on connect', assignment => {
+    console.log(assignment);
+    if (assignment === 'drawer') {
+      CLIENTSTATE.drawer = true;
+    } else {
+      CLIENTSTATE.drawer = false;
     }
   });
 
