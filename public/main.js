@@ -2,11 +2,13 @@ function pictionary() {
   const socket = io();
   let canvas, context, guessBox, drawing = false;
 
+  // handle rendering of guesses
   function displayGuess(guess) {
     let lastGuessBox = $('#last-guess');
     lastGuessBox.empty().text(guess);
   }
 
+  // TODO: Refactor this to use form submission instead
   function onKeyDown(event) {
     if (event.keyCode != 13) {
       return;
@@ -33,11 +35,29 @@ function pictionary() {
   context = canvas[0].getContext('2d');     // <-- What does this canvas object look like?
   canvas[0].width = canvas[0].offsetWidth;
   canvas[0].height = canvas[0].offsetHeight;
-  canvas.on('mousemove', event => {
+
+  // Check for touchstart support, use if it has
+  // Use mousedown if not
+  let clickDown = ('ontouchstart' in document.documentElement) ? 'touchstart' : 'mousedown';
+  let clickUp = ('ontouchstart' in document.documentElement) ? 'touchend' : 'mouseup';
+  let cursorMove = ('ontouchstart' in document.documentElement) ? 'touchmove' : 'mousemove';
+
+  console.log(`clickDown: ${clickDown}`);
+  console.log(`clickUp: ${clickUp}`);
+  console.log(`cursorMove: ${cursorMove}`);
+
+  canvas.on(cursorMove, event => {
     if (drawing) {
-      let offset = canvas.offset();
-      let position = {x: event.pageX - offset.left,
-                      y: event.pageY - offset.top};
+      let position;
+      if (cursorMove === 'touchmove') {
+        let offset = canvas.offset();
+        position = {x: event.originalEvent.changedTouches[0].pageX - offset.left,
+                        y: event.originalEvent.changedTouches[0].pageY - offset.top};
+      } else {
+        let offset = canvas.offset();
+        position = {x: event.pageX - offset.left,
+                        y: event.pageY - offset.top};
+      }
       draw(position);
       socket.emit('draw event', position);
     }
@@ -47,11 +67,11 @@ function pictionary() {
     draw(position);
   });
 
-  canvas.on('mousedown', event => {
+  canvas.on(clickDown, event => {
     drawing = true;
   });
 
-  canvas.on('mouseup', event => {
+  canvas.on(clickUp, event => {
     drawing = false;
   });
 
