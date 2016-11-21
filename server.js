@@ -20,23 +20,56 @@ const server = http.Server(app);
 const io = socket_io(server);
 
 const APPSTATE = {
-  userCount: 0
+  userCount: 0,
+  drawerID: 0,
+  clientList: []
 }
 
 io.on('connection', socket => {
   APPSTATE.userCount++;
+  APPSTATE.clientList.push(socket.id);
   console.log(`User connected: ${APPSTATE.userCount}`);
 
   // TODO: Modularize the following code
   // Handle designation of drawer and guessers
   // Sends events to client to setup DOM correctly
-  
-  let assignment = (APPSTATE.userCount === 1) ? 'drawer' : 'guesser';
 
+  // let assignment = (APPSTATE.userCount === 1) ? 'drawer' : 'guesser';
+
+  let assignment = 'guess' //set to guesser by default
+
+  if (APPSTATE.userCount === 1) {
+    // set user to drawer and get ID
+    APPSTATE.drawerID = socket.id;
+    console.log(`DrawerID set: ${APPSTATE.drawerID}`);
+    assignment = 'drawer';
+  }
+
+  // send out assignment
   socket.emit('on connect', assignment);
 
-  socket.on('disconnect', socket => {
+  // for disconnect events
+  socket.on('disconnect', () => {
     APPSTATE.userCount--;
+    console.log(`Socket: ${socket}`);
+    console.log(`User disconnecting: ${socket.id}`);
+
+    // remove sockiet.id from clientList
+    // First, get the index
+    let index = APPSTATE.clientList.indexOf(socket.id);
+    console.log(`index: ${index}`);
+    console.log(`clientList Before slice: ${APPSTATE.clientList}`);
+    APPSTATE.clientList.splice(index, 1)
+    console.log(`clientList After: ${APPSTATE.clientList}`);
+
+    // check if disconnecting user is drawerID
+    // Reassign if so
+    if (APPSTATE.drawerID === socket.id) {
+      console.log(`Drawer disconnected, ID: ${APPSTATE.drawerID}`);
+      APPSTATE.drawerID = APPSTATE.clientList[0];
+      console.log(`NEw drawerID: ${APPSTATE.drawerID}`);
+      io.sockets.connected[APPSTATE.drawerID].emit('on connect', 'drawer');
+    }
     console.log(`User disconnected: ${APPSTATE.userCount}`);
   });
 
