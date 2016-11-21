@@ -6,6 +6,16 @@ function pictionary() {
     drawer: false,
   };
 
+  function hideOrDisplayTopMessage(assignment) {
+    let topMessage = $('#top-message');
+
+    if (assignment === 'drawer') {
+      topMessage.css('display', 'none');
+    } else if (assignment === 'guess') {
+      topMessage.css('display', 'flex');
+    }
+  }
+
   // handle rendering of guesses
   function displayGuess(guess) {
     let lastGuessBox = $('#last-guess');
@@ -68,12 +78,13 @@ function pictionary() {
   });
 
   socket.on('on connect', assignment => {
-    console.log(assignment);
+    console.log(`Role: ${assignment}`);
     if (assignment === 'drawer') {
       CLIENTSTATE.drawer = true;
     } else {
       CLIENTSTATE.drawer = false;
     }
+    hideOrDisplayTopMessage(assignment);
   });
 
   socket.on('draw event', position => {

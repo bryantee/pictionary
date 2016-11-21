@@ -57,17 +57,14 @@ io.on('connection', socket => {
     // remove sockiet.id from clientList
     // First, get the index
     let index = APPSTATE.clientList.indexOf(socket.id);
-    console.log(`index: ${index}`);
-    console.log(`clientList Before slice: ${APPSTATE.clientList}`);
     APPSTATE.clientList.splice(index, 1)
-    console.log(`clientList After: ${APPSTATE.clientList}`);
 
     // check if disconnecting user is drawerID
     // Reassign if so
     if (APPSTATE.drawerID === socket.id) {
       console.log(`Drawer disconnected, ID: ${APPSTATE.drawerID}`);
       APPSTATE.drawerID = APPSTATE.clientList[0];
-      console.log(`NEw drawerID: ${APPSTATE.drawerID}`);
+      console.log(`New drawerID: ${APPSTATE.drawerID}`);
       io.sockets.connected[APPSTATE.drawerID].emit('on connect', 'drawer');
     }
     console.log(`User disconnected: ${APPSTATE.userCount}`);
