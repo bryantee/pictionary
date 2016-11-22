@@ -2,6 +2,24 @@ function pictionary() {
   const socket = io();
   let canvas, context, guessBox, drawing = false;
 
+  const CLIENTSTATE = {
+    drawer: false,
+    word: null
+  };
+
+  function hideOrDisplayTopMessage(assignment) {
+    let guess = $('#guess');
+    let word = $('#word');
+
+    if (assignment === 'guess') {
+      guess.css('display', 'flex');
+      word.css('display', 'none');
+    } else {
+      guess.css('display', 'none');
+      word.css('display', 'flex').text(assignment);
+    }
+  }
+
   // handle rendering of guesses
   function displayGuess(guess) {
     let lastGuessBox = $('#last-guess');
@@ -42,9 +60,9 @@ function pictionary() {
   let clickUp = ('ontouchstart' in document.documentElement) ? 'touchend' : 'mouseup';
   let cursorMove = ('ontouchstart' in document.documentElement) ? 'touchmove' : 'mousemove';
 
-  console.log(`clickDown: ${clickDown}`);
-  console.log(`clickUp: ${clickUp}`);
-  console.log(`cursorMove: ${cursorMove}`);
+  // console.log(`clickDown: ${clickDown}`);
+  // console.log(`clickUp: ${clickUp}`);
+  // console.log(`cursorMove: ${cursorMove}`);
 
   canvas.on(cursorMove, event => {
     if (drawing) {
@@ -61,6 +79,18 @@ function pictionary() {
       draw(position);
       socket.emit('draw event', position);
     }
+  });
+
+  socket.on('on connect', assignment => {
+    console.log(`Role: ${assignment}`);
+    if (assignment === 'guess') {
+      CLIENTSTATE.drawer = false;
+    } else {
+      CLIENTSTATE.drawer = true;
+      CLIENTSTATE.word = assignment;
+    }
+    hideOrDisplayTopMessage(assignment);
+    context.clearRect(0, 0, canvas[0].width, canvas[0].height);
   });
 
   socket.on('draw event', position => {
