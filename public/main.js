@@ -4,15 +4,19 @@ function pictionary() {
 
   const CLIENTSTATE = {
     drawer: false,
+    word: null
   };
 
   function hideOrDisplayTopMessage(assignment) {
-    let topMessage = $('#top-message');
+    let guess = $('#guess');
+    let word = $('#word');
 
-    if (assignment === 'drawer') {
-      topMessage.css('display', 'none');
-    } else if (assignment === 'guess') {
-      topMessage.css('display', 'flex');
+    if (assignment === 'guess') {
+      guess.css('display', 'flex');
+      word.css('display', 'none');
+    } else {
+      guess.css('display', 'none');
+      word.css('display', 'flex').text(assignment);
     }
   }
 
@@ -79,10 +83,11 @@ function pictionary() {
 
   socket.on('on connect', assignment => {
     console.log(`Role: ${assignment}`);
-    if (assignment === 'drawer') {
-      CLIENTSTATE.drawer = true;
-    } else {
+    if (assignment === 'guess') {
       CLIENTSTATE.drawer = false;
+    } else {
+      CLIENTSTATE.drawer = true;
+      CLIENTSTATE.word = assignment;
     }
     hideOrDisplayTopMessage(assignment);
   });

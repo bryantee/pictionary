@@ -22,8 +22,32 @@ const io = socket_io(server);
 const APPSTATE = {
   userCount: 0,
   drawerID: 0,
-  clientList: []
+  clientList: [],
+  selectedWord: null,
+  words: [
+    "word", "letter", "number", "person", "pen", "class", "people",
+    "sound", "water", "side", "place", "man", "men", "woman", "women", "boy",
+    "girl", "year", "day", "week", "month", "name", "sentence", "line", "air",
+    "land", "home", "hand", "house", "picture", "animal", "mother", "father",
+    "brother", "sister", "world", "head", "page", "country", "question",
+    "answer", "school", "plant", "food", "sun", "state", "eye", "city", "tree",
+    "farm", "story", "sea", "night", "day", "life", "north", "south", "east",
+    "west", "child", "children", "example", "paper", "music", "river", "car",
+    "foot", "feet", "book", "science", "room", "friend", "idea", "fish",
+    "mountain", "horse", "watch", "color", "face", "wood", "list", "bird",
+    "body", "dog", "family", "song", "door", "product", "wind", "ship", "area",
+    "rock", "order", "fire", "problem", "piece", "top", "bottom", "king",
+    "space"
+  ]
 }
+
+function assignWord() {
+  let randomNumber = Math.floor(Math.random() * APPSTATE.words.length);
+  let word = APPSTATE.words[randomNumber];
+  APPSTATE.selectedWord = word;
+  console.log(`Word: ${APPSTATE.selectedWord}`);
+}
+
 
 io.on('connection', socket => {
   APPSTATE.userCount++;
@@ -42,7 +66,8 @@ io.on('connection', socket => {
     // set user to drawer and get ID
     APPSTATE.drawerID = socket.id;
     console.log(`DrawerID set: ${APPSTATE.drawerID}`);
-    assignment = 'drawer';
+    assignWord();
+    assignment = APPSTATE.selectedWord;
   }
 
   // send out assignment
@@ -64,8 +89,9 @@ io.on('connection', socket => {
     if (APPSTATE.drawerID === socket.id) {
       console.log(`Drawer disconnected, ID: ${APPSTATE.drawerID}`);
       APPSTATE.drawerID = APPSTATE.clientList[0];
+      assignWord();
       console.log(`New drawerID: ${APPSTATE.drawerID}`);
-      io.sockets.connected[APPSTATE.drawerID].emit('on connect', 'drawer');
+      io.sockets.connected[APPSTATE.drawerID].emit('on connect', APPSTATE.selectedWord);
     }
     console.log(`User disconnected: ${APPSTATE.userCount}`);
   });
@@ -77,6 +103,14 @@ io.on('connection', socket => {
   socket.on('guess', guess => {
     console.log(`A user guessed: ${guess}`);
     socket.broadcast.emit('guess', guess);
+
+    if (guess.toLowerCase().trim() === APPSTATE.selectedWord.toLowerCase()) {
+      // return win
+      assignWord();
+      console.log('Correct word guessed');
+      socket.emit('on connect', APPSTATE.selectedWord);
+      socket.broadcast.emit('on connect', 'guess');
+    }
   });
 });
 
