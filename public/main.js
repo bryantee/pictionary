@@ -90,6 +90,7 @@ function pictionary() {
       CLIENTSTATE.word = assignment;
     }
     hideOrDisplayTopMessage(assignment);
+    context.clearRect(0, 0, canvas[0].width, canvas[0].height);
   });
 
   socket.on('draw event', position => {
